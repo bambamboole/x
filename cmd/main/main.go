@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"x/pkg/args"
+	"x/pkg/command"
 	"x/pkg/config"
+	"x/pkg/utils"
 )
 
 func main() {
@@ -20,7 +21,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	logger := utils.NewLogger(arguments.Verbose)
 
-	fmt.Printf("%#v\n", cfg)
-	fmt.Printf("%#v\n", arguments)
+	cmd, err := command.New(arguments, cfg, logger)
+	if err != nil {
+		panic(err)
+	}
+	err = cmd.Execute()
+	if err != nil {
+		panic(err)
+	}
 }

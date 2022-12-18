@@ -2,13 +2,12 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
-	"os"
 	"path"
 	"strings"
+	"x/pkg/utils"
 )
 
 type Config struct {
@@ -18,38 +17,22 @@ type Config struct {
 	}
 }
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
-func folderExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return info.IsDir()
-}
-
 func findConfigFilePath(searchPath string) (string, error) {
 	run := true
 
 	configPath := ""
 
 	for run {
-		if fileExists(searchPath + "/x.yml") {
+		if utils.FileExists(searchPath + "/x.yml") {
 			configPath = strings.Clone(searchPath + "/x.yml")
 			run = false
 		}
-		if fileExists(searchPath + "/x.yaml") {
+		if utils.FileExists(searchPath + "/x.yaml") {
 			configPath = strings.Clone(searchPath + "/x.yaml")
 			run = false
 		}
 
-		if folderExists(searchPath + "/.git") {
+		if utils.FolderExists(searchPath + "/.git") {
 			run = false
 		}
 		if searchPath == "/" {
@@ -65,27 +48,26 @@ func findConfigFilePath(searchPath string) (string, error) {
 	return configPath, nil
 }
 
-func New(cwd string, additionalConfigFiles []string) (*Config, error) {
+func New(cwd string, additionalConfigFiles []string) (Config, error) {
+	cfg := Config{}
 	configFilePath, err := findConfigFilePath(cwd)
 	if err != nil {
-		return nil, err
+		return cfg, err
 	}
 	k := koanf.New(".")
 	if err = k.Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
-		return nil, err
+		return cfg, err
 	}
 	for _, configFile := range additionalConfigFiles {
-		if !fileExists(configFile) {
+		if !utils.FileExists(configFile) {
 			continue
 		}
-		fmt.Println(configFile)
 		if err = k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
-			return nil, err
+			return cfg, err
 		}
 	}
-	cfg := &Config{}
-	if err = k.Unmarshal("", cfg); err != nil {
-		return nil, err
+	if err = k.Unmarshal("", &cfg); err != nil {
+		return cfg, err
 	}
 
 	return cfg, nil
