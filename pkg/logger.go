@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"io"
 	"os"
 )
@@ -29,7 +30,12 @@ func (l *IOLogger) Debug(v any) {
 	if l.debug == false {
 		return
 	}
-	l.Log(v)
+	switch v.(type) {
+	default:
+		_, _ = fmt.Fprintf(l.out, "%#v\n", v)
+	case string:
+		_, _ = color.New(color.FgCyan).Fprintln(l.out, v)
+	}
 }
 
 func NewLogger(debug bool) Logger {
