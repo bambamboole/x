@@ -1,27 +1,10 @@
-package utils
+package pkg
 
-import "C"
 import (
 	"fmt"
 	"io"
 	"os"
 )
-
-func FileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
-func FolderExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return info.IsDir()
-}
 
 type Logger interface {
 	Log(v any)

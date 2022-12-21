@@ -1,4 +1,4 @@
-package config
+package pkg
 
 import (
 	"errors"
@@ -7,7 +7,6 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"path"
 	"strings"
-	"x/pkg/utils"
 )
 
 type Config struct {
@@ -23,16 +22,16 @@ func findConfigFilePath(searchPath string) (string, error) {
 	configPath := ""
 
 	for run {
-		if utils.FileExists(searchPath + "/x.yml") {
+		if fileExists(searchPath + "/x.yml") {
 			configPath = strings.Clone(searchPath + "/x.yml")
 			run = false
 		}
-		if utils.FileExists(searchPath + "/x.yaml") {
+		if fileExists(searchPath + "/x.yaml") {
 			configPath = strings.Clone(searchPath + "/x.yaml")
 			run = false
 		}
 
-		if utils.FolderExists(searchPath + "/.git") {
+		if folderExists(searchPath + "/.git") {
 			run = false
 		}
 		if searchPath == "/" {
@@ -48,7 +47,7 @@ func findConfigFilePath(searchPath string) (string, error) {
 	return configPath, nil
 }
 
-func New(cwd string, additionalConfigFiles []string) (Config, error) {
+func NewConfig(cwd string, additionalConfigFiles []string) (Config, error) {
 	cfg := Config{}
 	configFilePath, err := findConfigFilePath(cwd)
 	if err != nil {
@@ -59,7 +58,7 @@ func New(cwd string, additionalConfigFiles []string) (Config, error) {
 		return cfg, err
 	}
 	for _, configFile := range additionalConfigFiles {
-		if !utils.FileExists(configFile) {
+		if !fileExists(configFile) {
 			continue
 		}
 		if err = k.Load(file.Provider(configFile), yaml.Parser()); err != nil {

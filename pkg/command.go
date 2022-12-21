@@ -1,11 +1,8 @@
-package command
+package pkg
 
 import (
 	"os/exec"
 	"strings"
-	"x/pkg/args"
-	"x/pkg/config"
-	"x/pkg/utils"
 )
 
 type executorInterface interface {
@@ -13,7 +10,7 @@ type executorInterface interface {
 }
 
 type executor struct {
-	logger utils.Logger
+	logger Logger
 }
 
 func (e *executor) execute(command string, args ...string) error {
@@ -25,10 +22,11 @@ func (e *executor) execute(command string, args ...string) error {
 }
 
 type Command struct {
-	args     args.Arguments
-	config   config.Config
+	args     Arguments
+	config   Config
+	Taskfile Taskfile
 	executor executorInterface
-	logger   utils.Logger
+	logger   Logger
 }
 
 func (c *Command) Execute() error {
@@ -38,14 +36,15 @@ func (c *Command) Execute() error {
 		return c.executor.execute(executable.Path, leftoverArgs...)
 	}
 	bash, _ := exec.LookPath("bash")
-	leftoverArgs = append([]string{"source Taskfile", "&&", "task:" + firstArg}, leftoverArgs...)
+	leftoverArgs = append([]string{"source", c.Taskfile.path, "&&", "task:" + firstArg}, leftoverArgs...)
 	return c.executor.execute(bash, "-c", strings.Join(leftoverArgs, " "))
 }
 
-func New(args args.Arguments, cfg config.Config, logger utils.Logger) (*Command, error) {
+func NewCommand(args Arguments, cfg Config, tf Taskfile, logger Logger) (*Command, error) {
 	cmd := &Command{
 		args:     args,
 		config:   cfg,
+		Taskfile: tf,
 		executor: &executor{logger: logger},
 		logger:   logger,
 	}

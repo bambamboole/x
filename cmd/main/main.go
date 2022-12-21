@@ -2,32 +2,33 @@ package main
 
 import (
 	"os"
-	"x/pkg/args"
-	"x/pkg/command"
-	"x/pkg/config"
-	"x/pkg/utils"
+	x "x/pkg"
 )
 
 func main() {
-	arguments, err := args.ParseArgs(os.Args[1:])
+	arguments, err := x.ParseArgs(os.Args[1:])
 	if err != nil {
 		panic(err)
 	}
+	logger := x.NewLogger(arguments.Verbose)
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
-	cfg, err := config.New(cwd, arguments.ConfigFiles)
+	cfg, err := x.NewConfig(cwd, arguments.ConfigFiles)
 	if err != nil {
 		panic(err)
 	}
-	logger := utils.NewLogger(arguments.Verbose)
-
-	cmd, err := command.New(arguments, cfg, logger)
+	tf, err := x.NewTaskfile(cwd)
+	if err != nil {
+		panic(err)
+	}
+	cmd, err := x.NewCommand(arguments, cfg, tf, logger)
 	if err != nil {
 		panic(err)
 	}
 	err = cmd.Execute()
+	logger.Log(cmd)
 	if err != nil {
 		panic(err)
 	}
