@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/jessevdk/go-flags"
 	"os"
 	x "x/pkg"
 )
@@ -8,6 +9,9 @@ import (
 func main() {
 	arguments, err := x.ParseArgs(os.Args[1:])
 	if err != nil {
+		if flags.WroteHelp(err) {
+			return
+		}
 		panic(err)
 	}
 	logger := x.NewLogger(arguments.Verbose)
@@ -28,7 +32,6 @@ func main() {
 		panic(err)
 	}
 	err = cmd.Execute()
-	logger.Log(cmd)
 	if err != nil {
 		panic(err)
 	}

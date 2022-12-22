@@ -51,10 +51,11 @@ func (e *executor) execute(command string, args ...string) error {
 	e.logger.Log("Waiting...")
 
 	sig := <-cancelChan
-	if sig == syscall.SIGXFSZ || cmd.ProcessState == nil || cmd.ProcessState.Success() {
+	if sig == syscall.SIGXFSZ {
 		return nil
 	}
-
+	e.logger.Debug("Got signal: " + sig.String())
+	e.logger.Debug("Forwarding cancellation to process...")
 	return cmd.Process.Signal(sig)
 }
 
@@ -68,13 +69,11 @@ type Command struct {
 
 func (c *Command) Execute() error {
 	firstArg := c.args.Command[0]
-	leftoverArgs := c.args.Command[1:]
 	if executable, found := c.config.Executables[firstArg]; found {
-		return c.executor.execute(executable.Path, leftoverArgs...)
+		return c.executor.execute(executable.Path, c.args.Command[1:]...)
 	}
 	bash, _ := exec.LookPath("bash")
-	leftoverArgs = append([]string{"source", c.Taskfile.path, "&&", "task:" + firstArg}, leftoverArgs...)
-	return c.executor.execute(bash, "-c", strings.Join(leftoverArgs, " "))
+	return c.executor.execute(bash, "-c", c.Taskfile.script+"\ntask:"+strings.Join(c.args.Command, " "))
 }
 
 func NewCommand(args Arguments, cfg Config, tf Taskfile, logger Logger) (*Command, error) {

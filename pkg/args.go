@@ -1,8 +1,8 @@
 package pkg
 
 import (
-	"fmt"
 	"github.com/jessevdk/go-flags"
+	"os"
 )
 
 type Arguments struct {
@@ -13,11 +13,14 @@ type Arguments struct {
 
 func ParseArgs(args []string) (Arguments, error) {
 	a := Arguments{}
-	p := flags.NewParser(&a, flags.IgnoreUnknown)
+	p := flags.NewParser(&a, flags.IgnoreUnknown|flags.HelpFlag|flags.PrintErrors|flags.PassDoubleDash)
 	args, err := p.Parse()
 	if err != nil {
-		fmt.Printf("%#v\n", err)
 		return a, err
+	}
+	if len(args) == 0 {
+		p.WriteHelp(os.Stdout)
+		return a, &flags.Error{Type: flags.ErrHelp}
 	}
 	a.Command = args
 
