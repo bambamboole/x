@@ -49,13 +49,12 @@ func findConfigFilePath(searchPath string) (string, error) {
 
 func NewConfig(cwd string, additionalConfigFiles []string) (Config, error) {
 	cfg := Config{}
-	configFilePath, err := findConfigFilePath(cwd)
-	if err != nil {
-		return cfg, err
-	}
 	k := koanf.New(".")
-	if err = k.Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
-		return cfg, err
+	configFilePath, err := findConfigFilePath(cwd)
+	if err == nil {
+		if err = k.Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
+			return cfg, err
+		}
 	}
 	for _, configFile := range additionalConfigFiles {
 		if !fileExists(configFile) {
