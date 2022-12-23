@@ -14,7 +14,7 @@ func main() {
 		}
 		panic(err)
 	}
-	logger := x.NewLogger(arguments.Verbose)
+	logger := x.NewLogger(len(arguments.Verbose))
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)

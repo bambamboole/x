@@ -6,7 +6,7 @@ import (
 )
 
 type Arguments struct {
-	Verbose     bool     `short:"v" long:"verbose" description:"Enable debug output"`
+	Verbose     []bool   `short:"v" long:"verbose" description:"Enable debug output"`
 	ConfigFiles []string `short:"c" long:"config-files" description:"Additional config files to be loaded" default:"~/.x/config.yml"`
 	Command     []string
 }

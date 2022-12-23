@@ -15,7 +15,7 @@ type executorInterface interface {
 }
 
 type executor struct {
-	logger Logger
+	logger IOLoggerInterface
 }
 
 func (e *executor) captureOutput(stdout io.ReadCloser, stderr io.ReadCloser) {
@@ -38,7 +38,6 @@ func (e *executor) execute(command string, args ...string) error {
 	signal.Notify(cancelChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGXFSZ)
 	cmd := exec.Command(command, args...)
 
-	e.logger.Debug("Executing command: " + cmd.String())
 	go func() {
 		stdout, _ := cmd.StdoutPipe()
 		stderr, _ := cmd.StderrPipe()
@@ -54,8 +53,8 @@ func (e *executor) execute(command string, args ...string) error {
 	if sig == syscall.SIGXFSZ {
 		return nil
 	}
-	e.logger.Debug("Got signal: " + sig.String())
-	e.logger.Debug("Forwarding cancellation to process...")
+	e.logger.Log("Got signal: "+sig.String(), DebugOn)
+	e.logger.Log("Forwarding cancellation to process...", DebugOn)
 	return cmd.Process.Signal(sig)
 }
 
@@ -64,7 +63,7 @@ type Command struct {
 	config   Config
 	Taskfile Taskfile
 	executor executorInterface
-	logger   Logger
+	logger   IOLoggerInterface
 }
 
 func (c *Command) Execute() error {
@@ -73,10 +72,13 @@ func (c *Command) Execute() error {
 		return c.executor.execute(executable.Path, c.args.Command[1:]...)
 	}
 	bash, _ := exec.LookPath("bash")
-	return c.executor.execute(bash, "-c", c.Taskfile.script+"\ntask:"+strings.Join(c.args.Command, " "))
+	task := "task:" + strings.Join(c.args.Command, " ")
+	c.logger.Log("Using Taskfile content: "+c.Taskfile.script, DebugVerbose)
+	c.logger.Log("Executing command: "+task, DebugOn)
+	return c.executor.execute(bash, "-c", c.Taskfile.script+"\n"+task)
 }
 
-func NewCommand(args Arguments, cfg Config, tf Taskfile, logger Logger) (*Command, error) {
+func NewCommand(args Arguments, cfg Config, tf Taskfile, logger IOLoggerInterface) (*Command, error) {
 	cmd := &Command{
 		args:     args,
 		config:   cfg,
