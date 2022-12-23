@@ -7,14 +7,9 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macOs-latest]
+        goos: [linux, darwin]
         arch: [amd64, arm64]
-        include:
-          - os: ubuntu-latest
-            goos: linux
-          - os: macOs-latest
-            goos: darwin
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
