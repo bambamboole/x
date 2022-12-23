@@ -71,7 +71,7 @@ func (c *Command) Execute() error {
 	}
 	bash, _ := exec.LookPath("bash")
 	task := "task:" + strings.Join(c.args.Command, " ")
-	c.logger.Log("Using Taskfile content: "+c.Taskfile.script, DebugVerbose)
+	c.logger.Log("Using Taskfile content: \n"+c.Taskfile.script, DebugVerbose)
 	c.logger.Log("Executing command: "+task, DebugOn)
 	return c.executor.execute(bash, "-c", c.Taskfile.script+"\n"+task)
 }
