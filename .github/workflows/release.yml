@@ -45,11 +45,11 @@ jobs:
       - name: Build binary list
         id: files
         run: |
-          content=$(ls -R | grep x-)
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "x_binaries=$content" >> $GITHUB_OUTPUT
+          X_BINARIES=$(ls -R | grep x-)
+          X_BINARIES="${X_BINARIES//'%'/'%25'}"
+          X_BINARIES="${X_BINARIES//$'\n'/'%0A'}"
+          X_BINARIES="${X_BINARIES//$'\r'/'%0D'}"
+          echo "x_binaries=$X_BINARIES" >> $GITHUB_OUTPUT
 #      - name: build release
 #        uses: softprops/action-gh-release@v1
 #        with:
