@@ -44,10 +44,8 @@ func (e *executor) execute(command string, args ...string) error {
 		_ = cmd.Start()
 		e.captureOutput(stdout, stderr)
 		_ = cmd.Wait()
-		e.logger.Log("Finished")
 		cancelChan <- syscall.SIGXFSZ
 	}()
-	e.logger.Log("Waiting...")
 
 	sig := <-cancelChan
 	if sig == syscall.SIGXFSZ {
