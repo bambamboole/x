@@ -43,7 +43,7 @@ jobs:
       - name: Build binary list
         run: |
           X_BINARIES=$(ls -R | grep x-)
-          echo "X_BINARIES=$X_BINARIES" >> $GITHUB_ENV
+          echo "X_BINARIES=\"$X_BINARIES\"" >> $GITHUB_ENV
           echo $GITHUB_ENV
 #      - name: build release
 #        uses: softprops/action-gh-release@v1
