@@ -22,11 +22,14 @@ jobs:
       - name: Download & verify dependencies
         run: go mod download && go mod verify
       - name: Build
-        run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.arch }} go build -o x-${{ inputs.tags }}-${{ matrix.goos }}-${{ matrix.arch }} cmd/main/main.go
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.arch }}
+        run: go build -o x-${{ inputs.tag }}-${{ matrix.goos }}-${{ matrix.arch }} cmd/main/main.go
       - uses: actions/upload-artifact@v3
         with:
           name: binaries
-          path: ./x-${{ inputs.tags }}-${{ matrix.goos }}-${{ matrix.arch }}
+          path: ./x-${{ inputs.tag }}-${{ matrix.goos }}-${{ matrix.arch }}
           if-no-files-found: error
   release:
     needs: build
@@ -36,7 +39,7 @@ jobs:
         with:
           name: binaries
       - name: Display structure of downloaded files
-        run: ls -R
+        run: ls -R | grep x-
 #      - name: build release
 #        uses: softprops/action-gh-release@v1
 #        with:
