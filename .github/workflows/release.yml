@@ -40,12 +40,15 @@ jobs:
           name: binaries
       - name: Display structure of downloaded files
         run: ls -R | grep x-
+      - name: Build binary list
+        run: |
+          X_BINARIES=$(ls -R | grep x-)
+          echo "X_BINARIES=$X_BINARIES" >> $GITHUB_ENV
+          echo $GITHUB_ENV
 #      - name: build release
 #        uses: softprops/action-gh-release@v1
 #        with:
 #          generate_release_notes: true
 #          tag_name: ${{ inputs.tags }}
 #          with:
-#            files: |
-#              Release.txt
-#              LICENSE
+#            files: ${{ env.X_BINARIES }}
