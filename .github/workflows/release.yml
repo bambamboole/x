@@ -42,7 +42,7 @@ jobs:
         run: ls -R | grep x-
       - name: Build binary list
         id: files
-        run: echo "x_binaries=$(ls -R | grep x-)" >> $GITHUB_OUTPUT
+        run: echo "x_binaries=\"$(ls -R | grep x-)\"" >> $GITHUB_OUTPUT
 #      - name: build release
 #        uses: softprops/action-gh-release@v1
 #        with:
