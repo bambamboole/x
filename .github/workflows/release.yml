@@ -1,7 +1,11 @@
 name: Release
 
 on:
-  push:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag of the new release"
+        required: true
 
 jobs:
   build:
@@ -18,5 +22,27 @@ jobs:
       - name: Download & verify dependencies
         run: go mod download && go mod verify
       - name: Build
-        run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.arch }} go build -o x cmd/main/main.go
-
+        run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.arch }} go build -o x-${{ inputs.tags }}-${{ matrix.goos }}-${{ matrix.arch }} cmd/main/main.go
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: ./x-${{ inputs.tags }}-${{ matrix.goos }}-${{ matrix.arch }}
+          if-no-files-found: error
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: binaries
+      - name: Display structure of downloaded files
+        run: ls -R
+#      - name: build release
+#        uses: softprops/action-gh-release@v1
+#        with:
+#          generate_release_notes: true
+#          tag_name: ${{ inputs.tags }}
+#          with:
+#            files: |
+#              Release.txt
+#              LICENSE
