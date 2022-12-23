@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  dist_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download & verify dependencies
+        run: go mod download && go mod verify
+      - name: Build
+        run: go build -o x cmd/main/main.go
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./x
+          asset_name: x-${{ github.event.release.tag_name }}-linux-x86_64
+          asset_content_type: binary/octet-stream
