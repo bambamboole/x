@@ -1,13 +1,20 @@
 name: Release
 
 on:
-  release:
-    types:
-      - created
+  workflow_dispatch:
 
 jobs:
-  dist_linux:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOs-latest]
+        arch: [amd64, arm64]
+        include:
+          - os: ubuntu-latest
+            goos: linux
+          - os: macOs-latest
+            goos: darwin
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -16,33 +23,4 @@ jobs:
       - name: Download & verify dependencies
         run: go mod download && go mod verify
       - name: Build
-        run: go build -o x cmd/main/main.go
-      - name: Upload
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./x
-          asset_name: x-${{ github.event.release.tag_name }}-linux-x86_64
-          asset_content_type: binary/octet-stream
-  dist_macos:
-    runs-on: macOS-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: './go.mod'
-      - name: Download & verify dependencies
-        run: go mod download && go mod verify
-      - name: Build
-        run: go build -o x cmd/main/main.go
-      - name: Upload
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./x
-          asset_name: x-${{ github.event.release.tag_name }}-macos-64
-          asset_content_type: binary/octet-stream
+        run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.arch }} go build -o x cmd/main/main.go
