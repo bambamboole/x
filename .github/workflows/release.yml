@@ -40,8 +40,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: binaries
-      - name: Display structure of downloaded files
-        run: ls -R | grep x-
       - name: Build binary list
         id: files
         run: |
@@ -50,6 +48,8 @@ jobs:
           X_BINARIES="${X_BINARIES//$'\n'/'%0A'}"
           X_BINARIES="${X_BINARIES//$'\r'/'%0D'}"
           echo "x_binaries=$X_BINARIES" >> $GITHUB_OUTPUT
+      - name: debug
+        run: echo ${{ steps.files.outputs.x_binaries }}
 #      - name: build release
 #        uses: softprops/action-gh-release@v1
 #        with:
