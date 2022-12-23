@@ -43,11 +43,10 @@ jobs:
       - name: Build binary list
         id: files
         run: |
-          X_BINARIES=$(ls -R | grep x-)
-          X_BINARIES="${X_BINARIES//'%'/'%25'}"
-          X_BINARIES="${X_BINARIES//$'\n'/'%0A'}"
-          X_BINARIES="${X_BINARIES//$'\r'/'%0D'}"
-          echo "x_binaries=$X_BINARIES" >> $GITHUB_OUTPUT
+          delimiter="$(openssl rand -hex 8)"
+          echo "x-binaries<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo $(ls -R | grep x-) >> "${GITHUB_OUTPUT}"
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
       - name: debug
         run: echo ${{ steps.files.outputs.x_binaries }}
 #      - name: build release
@@ -55,5 +54,6 @@ jobs:
 #        with:
 #          generate_release_notes: true
 #          tag_name: ${{ inputs.tags }}
-#          with:
+description:
+runs:#          with:
 #            files: ${{ steps.files.outputs.x_binaries }}
