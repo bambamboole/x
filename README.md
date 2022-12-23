@@ -1,4 +1,6 @@
 # X
+Early alpha stage. Until now it is playground of ideas and everything can change.
+
 `x` is a Bash task runner written in Go. It has the goal to make your
 utility scripts as easy as possible to execute. It is heavily inspired by
 `Makefile` and [`b5`](https://github.com/team23/b5)
