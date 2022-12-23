@@ -18,4 +18,5 @@ jobs:
       - name: Download & verify dependencies
         run: go mod download && go mod verify
       - name: Build
-        run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.arch }} go build -o x cmd/main/main.go
+        run: CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.arch }} go build -o x cmd/main/main.go
+
