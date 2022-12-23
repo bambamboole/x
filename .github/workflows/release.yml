@@ -34,6 +34,8 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      x_binaries: ${{ steps.files.outputs.x_binaries }}
     steps:
       - uses: actions/download-artifact@v3
         with:
@@ -42,7 +44,12 @@ jobs:
         run: ls -R | grep x-
       - name: Build binary list
         id: files
-        run: echo "x_binaries=\"$(ls -R | grep x-)\"" >> $GITHUB_OUTPUT
+        run: |
+          content=$(ls -R | grep x-)
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "x_binaries=$content" >> $GITHUB_OUTPUT
 #      - name: build release
 #        uses: softprops/action-gh-release@v1
 #        with:
