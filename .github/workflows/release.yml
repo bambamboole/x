@@ -44,13 +44,10 @@ jobs:
         id: files
         run: |
           x_binaries=$(ls -R | grep x-)
-          echo ${x_binaries}
           delimiter="$(openssl rand -hex 8)"
           echo "x_binaries<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo "${x_binaries}" >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
-      - name: debug
-        run: echo "${{ steps.files.outputs.x_binaries }}"
       - name: create release
         uses: softprops/action-gh-release@v1
         with:
