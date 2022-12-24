@@ -44,7 +44,7 @@ jobs:
         id: files
         run: |
           delimiter="$(openssl rand -hex 8)"
-          echo "x-binaries<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo "x_binaries<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo $(ls -R | grep x-) >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
       - name: debug
