@@ -1,9 +1,9 @@
 package main
 
 import (
+	x "github.com/bambamboole/x/pkg"
 	"github.com/jessevdk/go-flags"
 	"os"
-	x "x/pkg"
 )
 
 func main() {

@@ -1,0 +1,44 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+release:
+  prerelease: false
+builds:
+  - main: ./cmd/main/main.go
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    format: binary
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+brews:
+  - name: x
+    tap:
+      owner: bambamboole
+      name: x
+    commit_author:
+      name: bambamboole
+      email: manuel@christlieb.eu
+    folder: Formula
+    homepage: https://github.com/bambamboole/x
+    description: a simple and fast task runner

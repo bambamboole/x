@@ -1,4 +1,4 @@
-module x
+module github.com/bambamboole/x
 
 go 1.19
 
