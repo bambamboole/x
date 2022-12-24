@@ -43,15 +43,17 @@ jobs:
       - name: Build binary list
         id: files
         run: |
+          X_BINARIES=$(ls -R | grep x-)
+          echo $X_BINARIES
           delimiter="$(openssl rand -hex 8)"
           echo "x_binaries<<${delimiter}" >> "${GITHUB_OUTPUT}"
-          echo $(ls -R | grep x-) >> "${GITHUB_OUTPUT}"
+          echo "$X_BINARIES" >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
       - name: debug
         run: echo ${{ steps.files.outputs.x_binaries }}
-      - name: create release
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-          tag_name: ${{ inputs.tag }}
-          files: ${{ steps.files.outputs.x_binaries }}
+#      - name: create release
+#        uses: softprops/action-gh-release@v1
+#        with:
+#          generate_release_notes: true
+#          tag_name: ${{ inputs.tag }}
+#          files: ${{ steps.files.outputs.x_binaries }}
