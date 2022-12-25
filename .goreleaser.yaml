@@ -35,10 +35,9 @@ brews:
   - name: x
     tap:
       owner: bambamboole
-      name: x
+      name: homebrew-x
     commit_author:
       name: bambamboole
       email: manuel@christlieb.eu
-    folder: Formula
     homepage: https://github.com/bambamboole/x
     description: a simple and fast task runner
