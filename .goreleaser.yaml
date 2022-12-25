@@ -41,3 +41,5 @@ brews:
       email: manuel@christlieb.eu
     homepage: https://github.com/bambamboole/x
     description: a simple and fast task runner
+    install: |
+          bin.install "x"
