@@ -1,57 +1,28 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "Tag of the new release"
-        required: true
+  push:
+    # run only against tags
+    tags:
+      - '*'
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        goos: [linux, darwin]
-        arch: [amd64, arm64]
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: git fetch --force --tags
       - uses: actions/setup-go@v3
         with:
           go-version-file: './go.mod'
       - name: Download & verify dependencies
         run: go mod download && go mod verify
-      - name: Build
+      - uses: goreleaser/goreleaser-action@v4
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist
         env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.arch }}
-        run: go build -o x-${{ inputs.tag }}-${{ matrix.goos }}-${{ matrix.arch }} cmd/main/main.go
-      - uses: actions/upload-artifact@v3
-        with:
-          name: binaries
-          path: ./x-${{ inputs.tag }}-${{ matrix.goos }}-${{ matrix.arch }}
-          if-no-files-found: error
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    outputs:
-      x_binaries: ${{ steps.files.outputs.x_binaries }}
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: binaries
-      - name: Build binary list
-        id: files
-        run: |
-          x_binaries=$(ls -R | grep x-)
-          delimiter="$(openssl rand -hex 8)"
-          echo "x_binaries<<${delimiter}" >> "${GITHUB_OUTPUT}"
-          echo "${x_binaries}" >> "${GITHUB_OUTPUT}"
-          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
-      - name: create release
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-          tag_name: ${{ inputs.tag }}
-          files: |
-           ${{ steps.files.outputs.x_binaries }}
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
