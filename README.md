@@ -5,6 +5,16 @@ Early alpha stage. Until now it is playground of ideas and everything can change
 utility scripts as easy as possible to execute. It is heavily inspired by
 `Makefile` and [`b5`](https://github.com/team23/b5)
 
+## Installation
+X is build in Go and has therefor a single dependency free binary. You can find 
+the right one for your platform attached to the [releases](https://github.com/bambamboole/x/releases).
+### Homebrew
+x is available via Homebrew by adding a custom tap:
+```shell
+brew tap bambamboole/x
+brew install x
+```
+
 ## Features
 * Taskfile
 * config
