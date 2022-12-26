@@ -9,8 +9,7 @@ before:
 release:
   prerelease: false
 builds:
-  - main: ./cmd/main/main.go
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - linux
