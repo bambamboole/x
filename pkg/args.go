@@ -16,14 +16,18 @@ type Arguments struct {
 
 func ParseArgs(args []string, stdout io.Writer) (Arguments, error) {
 	a := Arguments{}
-	p := flags.NewParser(&a, flags.IgnoreUnknown|flags.HelpFlag|flags.PrintErrors|flags.PassDoubleDash)
-	args, err := p.Parse()
-	if err != nil {
-		return a, err
-	}
+	p := flags.NewParser(&a, flags.IgnoreUnknown|flags.HelpFlag|flags.PassDoubleDash)
+	args, err := p.ParseArgs(args)
 	if len(args) == 0 {
-		p.WriteHelp(stdout)
-		return a, &flags.Error{Type: flags.ErrHelp}
+		err = &flags.Error{Type: flags.ErrHelp}
+	}
+	if err != nil {
+		flagsErr, ok := err.(*flags.Error)
+		if ok && flagsErr.Type == flags.ErrHelp {
+			p.WriteHelp(stdout)
+
+		}
+		return a, err
 	}
 	// append verbose flag if present, since it gets removed by the flags parser
 	if len(a.Verbose) > 0 {
