@@ -3,7 +3,6 @@ package pkg
 import (
 	"os"
 	"path"
-	"strings"
 )
 
 func fileExists(filename string) bool {
@@ -30,27 +29,14 @@ func isGitRepo(p string) bool {
 	return directoryExists(path.Join(p, ".git"))
 }
 
-func findFiles(searchPath string, fileNames []string) []string {
-	stopFunctions := []func(string) bool{isGitRepo, isRoot}
-	files := make([]string, 0)
-
-	run := true
-
-	for run {
-		for _, fileName := range fileNames {
-			configPath := path.Join(searchPath, fileName)
-			if fileExists(configPath) {
-				files = append(files, strings.Clone(configPath))
-				run = false
-			}
+func DetectProjectPath(startPath string) string {
+	for {
+		if isGitRepo(startPath) {
+			return startPath
 		}
-		for _, stopFunction := range stopFunctions {
-			if stopFunction(searchPath) {
-				run = false
-			}
+		if isRoot(startPath) {
+			return ""
 		}
-		searchPath = path.Dir(searchPath)
+		startPath = path.Dir(startPath)
 	}
-
-	return files
 }

@@ -17,22 +17,30 @@ func main() {
 	logger := x.NewLogger(len(arguments.Verbose))
 	cwd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		logger.Error(err)
+		return
 	}
-	cfg, err := x.NewConfig(cwd, arguments.ConfigFiles)
+	projectPath := x.DetectProjectPath(cwd)
+	logger.Log("Use project path: "+projectPath, x.DebugOn)
+	tf, err := x.NewTaskfile(logger, projectPath, arguments.Taskfiles)
 	if err != nil {
-		panic(err)
+		logger.Error(err)
+		return
 	}
-	tf, err := x.NewTaskfile(cwd)
+	cfg, err := x.NewConfig(logger, projectPath, arguments.ConfigFiles)
 	if err != nil {
-		panic(err)
+		logger.Error(err)
+		return
 	}
-	runtime, err := x.NewRuntime(arguments, cfg, tf, logger)
+
+	runtime, err := x.NewRuntime(projectPath, cwd, arguments, cfg, tf, logger)
 	if err != nil {
-		panic(err)
+		logger.Error(err)
+		return
 	}
 	err = runtime.Execute()
 	if err != nil {
-		panic(err)
+		logger.Error(err)
+		return
 	}
 }

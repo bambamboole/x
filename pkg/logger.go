@@ -15,6 +15,7 @@ const (
 
 type IOLoggerInterface interface {
 	Log(v any, debugLevel ...int)
+	Error(v any)
 }
 
 type IOLogger struct {
@@ -39,6 +40,14 @@ func (l *IOLogger) Log(v any, debugLevel ...int) {
 	case DebugVeryVerbose:
 		col = color.New(color.FgGreen)
 	}
+	l.write(v, col)
+}
+
+func (l *IOLogger) Error(v any) {
+	l.write(v, color.New(color.FgRed))
+}
+
+func (l *IOLogger) write(v any, col *color.Color) {
 	switch v.(type) {
 	default:
 		_, _ = col.Fprintf(l.out, "%#v\n", v)
