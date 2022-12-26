@@ -43,6 +43,10 @@ func (l *IOLogger) Log(v any, debugLevel ...int) {
 }
 
 func (l *IOLogger) Error(v any) {
+	err, ok := v.(error)
+	if ok {
+		v = err.Error()
+	}
 	l.write(v, color.New(color.FgRed))
 }
 
