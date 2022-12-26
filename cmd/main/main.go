@@ -15,6 +15,7 @@ func main() {
 		panic(err)
 	}
 	logger := x.NewLogger(len(arguments.Verbose))
+	logger.Log("x " + x.Version + " (Commit: " + x.Commit + ", Build date: " + x.Date + ")")
 	cwd, err := os.Getwd()
 	if err != nil {
 		logger.Error(err)

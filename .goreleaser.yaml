@@ -5,6 +5,7 @@ before:
   hooks:
     - go mod tidy
     - go mod download
+    - go mod verify
 release:
   prerelease: false
 builds:
@@ -17,6 +18,14 @@ builds:
     goarch:
       - amd64
       - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/bambamboole/x/pkg.Version=v{{.Version}}
+      - -X github.com/bambamboole/x/pkg.Commit={{printf "%.8s" .Commit}}
+      - -X github.com/bambamboole/x/pkg.Date={{time "2006-01-02"}}
 archives:
   - name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
     format: binary
