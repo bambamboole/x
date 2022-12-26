@@ -3,6 +3,7 @@ package pkg
 import (
 	"github.com/jessevdk/go-flags"
 	"os"
+	"strings"
 )
 
 type Arguments struct {
@@ -23,6 +24,10 @@ func ParseArgs(args []string) (Arguments, error) {
 	if len(args) == 0 {
 		p.WriteHelp(os.Stdout)
 		return a, &flags.Error{Type: flags.ErrHelp}
+	}
+	// append verbose flag if present, since it gets removed by the flags parser
+	if len(a.Verbose) > 0 {
+		args = append(args, "-"+strings.Repeat("v", len(a.Verbose)))
 	}
 	a.Command = args
 
