@@ -56,7 +56,7 @@ func (e *executor) execute(command string, args ...string) error {
 	return cmd.Process.Signal(sig)
 }
 
-type Command struct {
+type Runtime struct {
 	args     Arguments
 	config   Config
 	Taskfile Taskfile
@@ -64,20 +64,20 @@ type Command struct {
 	logger   IOLoggerInterface
 }
 
-func (c *Command) Execute() error {
-	firstArg := c.args.Command[0]
-	if executable, found := c.config.Executables[firstArg]; found {
-		return c.executor.execute(executable.Path, c.args.Command[1:]...)
+func (r *Runtime) Execute() error {
+	firstArg := r.args.Command[0]
+	if executable, found := r.config.Executables[firstArg]; found {
+		return r.executor.execute(executable.Path, r.args.Command[1:]...)
 	}
-	bash, _ := exec.LookPath("bash")
-	task := "task:" + strings.Join(c.args.Command, " ")
-	c.logger.Log("Using Taskfile content: \n"+c.Taskfile.script, DebugVerbose)
-	c.logger.Log("Executing command: "+task, DebugOn)
-	return c.executor.execute(bash, "-c", c.Taskfile.script+"\n"+task)
+	bash, _ := exec.LookPath(r.args.Shell)
+	task := "task:" + strings.Join(r.args.Command, " ")
+	r.logger.Log("Using Taskfile content: \n"+r.Taskfile.script, DebugVerbose)
+	r.logger.Log("Executing command: "+task, DebugOn)
+	return r.executor.execute(bash, "-c", r.Taskfile.script+"\n"+task)
 }
 
-func NewCommand(args Arguments, cfg Config, tf Taskfile, logger IOLoggerInterface) (*Command, error) {
-	cmd := &Command{
+func NewRuntime(args Arguments, cfg Config, tf Taskfile, logger IOLoggerInterface) (*Runtime, error) {
+	cmd := &Runtime{
 		args:     args,
 		config:   cfg,
 		Taskfile: tf,

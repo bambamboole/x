@@ -27,11 +27,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	cmd, err := x.NewCommand(arguments, cfg, tf, logger)
+	runtime, err := x.NewRuntime(arguments, cfg, tf, logger)
 	if err != nil {
 		panic(err)
 	}
-	err = cmd.Execute()
+	err = runtime.Execute()
 	if err != nil {
 		panic(err)
 	}

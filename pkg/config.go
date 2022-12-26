@@ -1,12 +1,9 @@
 package pkg
 
 import (
-	"errors"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
-	"path"
-	"strings"
 )
 
 type Config struct {
@@ -16,43 +13,11 @@ type Config struct {
 	}
 }
 
-func findConfigFilePath(searchPath string) (string, error) {
-	run := true
-
-	configPath := ""
-
-	for run {
-		if fileExists(searchPath + "/x.yml") {
-			configPath = strings.Clone(searchPath + "/x.yml")
-			run = false
-		}
-		if fileExists(searchPath + "/x.yaml") {
-			configPath = strings.Clone(searchPath + "/x.yaml")
-			run = false
-		}
-
-		if folderExists(searchPath + "/.git") {
-			run = false
-		}
-		if searchPath == "/" {
-			run = false
-		}
-		searchPath = path.Dir(searchPath)
-	}
-
-	if configPath == "" {
-		return configPath, errors.New("config file not found")
-	}
-
-	return configPath, nil
-}
-
 func NewConfig(cwd string, additionalConfigFiles []string) (Config, error) {
 	cfg := Config{}
 	k := koanf.New(".")
-	configFilePath, err := findConfigFilePath(cwd)
-	if err == nil {
-		if err = k.Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
+	for _, configFile := range findFiles(cwd, []string{"x.yml", "x.yaml", "x.local.yml", "x.local.yaml"}) {
+		if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
 			return cfg, err
 		}
 	}
@@ -60,11 +25,11 @@ func NewConfig(cwd string, additionalConfigFiles []string) (Config, error) {
 		if !fileExists(configFile) {
 			continue
 		}
-		if err = k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
+		if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
 			return cfg, err
 		}
 	}
-	if err = k.Unmarshal("", &cfg); err != nil {
+	if err := k.Unmarshal("", &cfg); err != nil {
 		return cfg, err
 	}
 

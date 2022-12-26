@@ -1,54 +1,26 @@
 package pkg
 
 import (
-	"errors"
 	"os"
-	"path"
 	"strings"
 )
 
 type Taskfile struct {
-	path   string
 	script string
 }
 
-func findTaskFilePath(searchPath string) (string, error) {
-	run := true
-
-	taskfilePath := ""
-
-	for run {
-		if fileExists(searchPath + "/Taskfile") {
-			taskfilePath = strings.Clone(searchPath + "/Taskfile")
-			run = false
-		}
-
-		if folderExists(searchPath + "/.git") {
-			run = false
-		}
-		if searchPath == "/" {
-			run = false
-		}
-		searchPath = path.Dir(searchPath)
-	}
-
-	if taskfilePath == "" {
-		return taskfilePath, errors.New("Taskfile not found.")
-	}
-
-	return taskfilePath, nil
-}
-
 func NewTaskfile(searchPath string) (Taskfile, error) {
-	taskFilePath, err := findTaskFilePath(searchPath)
-	if err != nil {
-		return Taskfile{}, err
+	taskFiles := findFiles(searchPath, []string{"Taskfile", "Taskfile.local"})
+	scriptContent := ""
+	for _, taskFile := range taskFiles {
+		content, err := os.ReadFile(taskFile)
+		if err != nil {
+			return Taskfile{}, err
+		}
+		scriptContent = scriptContent + "\n" + string(content)
 	}
-	script, err := os.ReadFile(taskFilePath)
-	if err != nil {
-		return Taskfile{}, err
-	}
-	tf := Taskfile{path: taskFilePath, script: string(script)}
+
+	tf := Taskfile{script: strings.TrimPrefix(scriptContent, "\n")}
 
 	return tf, nil
 }

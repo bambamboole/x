@@ -21,10 +21,10 @@ func Test_fileExists(t *testing.T) {
 func Test_folderExists(t *testing.T) {
 	t.Run("it can check if a folder exists", func(t *testing.T) {
 		_, filename, _, _ := runtime.Caller(0)
-		assert.True(t, folderExists(path.Join(path.Dir(filename), "fixtures", "test_project")))
+		assert.True(t, directoryExists(path.Join(path.Dir(filename), "fixtures", "test_project")))
 	})
-	t.Run("it returns false on a file for folderExists", func(t *testing.T) {
+	t.Run("it returns false on a file for directoryExists", func(t *testing.T) {
 		_, filename, _, _ := runtime.Caller(0)
-		assert.False(t, folderExists(path.Join(path.Dir(filename), "fixtures", "test_project", "dummy_file.txt")))
+		assert.False(t, directoryExists(path.Join(path.Dir(filename), "fixtures", "test_project", "dummy_file.txt")))
 	})
 }
