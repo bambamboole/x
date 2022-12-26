@@ -39,7 +39,12 @@ func Execute() {
 		os.Exit(1)
 	}
 
-	runtime, err := x.NewRuntime(os.Stdin, stdout, os.Stderr, projectPath, arguments, cfg, tf, logger)
+	commandManager := &x.CommandManager{
+		Stdin:  os.Stdin,
+		Stdout: stdout,
+		Stderr: os.Stderr,
+	}
+	runtime, err := x.NewRuntime(commandManager, projectPath, arguments, cfg, tf, logger)
 	if err != nil {
 		logger.Error(err)
 		os.Exit(1)

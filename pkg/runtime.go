@@ -1,33 +1,25 @@
 package pkg
 
 import (
-	"io"
 	"os"
-	"os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
 )
 
 type Runtime struct {
-	stdin       io.Reader
-	stdout      io.Writer
-	stderr      io.Writer
-	projectPath string
-	args        Arguments
-	config      Config
-	Taskfile    Taskfile
-	logger      IOLoggerInterface
+	commandManager CommandManagerInterface
+	projectPath    string
+	args           Arguments
+	config         Config
+	Taskfile       Taskfile
+	logger         IOLoggerInterface
 }
 
 func (r *Runtime) execute(command string, args ...string) error {
 	cancelChan := make(chan os.Signal, 1)
 	signal.Notify(cancelChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGXFSZ)
-	cmd := exec.Command(command, args...)
-	cmd.Dir = r.projectPath
-	cmd.Stdin = r.stdin
-	cmd.Stdout = r.stdout
-	cmd.Stderr = r.stderr
+	cmd := r.commandManager.Create(r.projectPath, command, args)
 
 	go func() {
 		_ = cmd.Run()
@@ -40,11 +32,11 @@ func (r *Runtime) execute(command string, args ...string) error {
 	}
 	r.logger.Log("Got signal: "+sig.String(), DebugOn)
 	r.logger.Log("Forwarding cancellation to process...", DebugOn)
-	return cmd.Process.Signal(sig)
+	return r.commandManager.Stop(cmd, sig)
 }
 
 func (r *Runtime) Run() error {
-	shell, _ := exec.LookPath(r.args.Shell)
+	shell, _ := r.commandManager.FindExecutable(r.args.Shell)
 	task := "task:" + strings.Join(r.args.Command, " ")
 	r.logger.Log("Using Taskfile content: \n"+r.Taskfile.script, DebugVerbose)
 	r.logger.Log("Executing command: " + task)
@@ -52,9 +44,7 @@ func (r *Runtime) Run() error {
 }
 
 func NewRuntime(
-	stdin io.Reader,
-	stdout io.Writer,
-	stderr io.Writer,
+	commandManager CommandManagerInterface,
 	projectPath string,
 	args Arguments,
 	cfg Config,
@@ -62,14 +52,12 @@ func NewRuntime(
 	logger IOLoggerInterface,
 ) (*Runtime, error) {
 	cmd := &Runtime{
-		stdin:       stdin,
-		stdout:      stdout,
-		stderr:      stderr,
-		projectPath: projectPath,
-		args:        args,
-		config:      cfg,
-		Taskfile:    tf,
-		logger:      logger,
+		commandManager: commandManager,
+		projectPath:    projectPath,
+		args:           args,
+		config:         cfg,
+		Taskfile:       tf,
+		logger:         logger,
 	}
 
 	return cmd, nil
