@@ -7,14 +7,15 @@ import (
 )
 
 func Execute() {
-	arguments, err := x.ParseArgs(os.Args[1:])
+	stdout := os.Stdout
+	arguments, err := x.ParseArgs(os.Args[1:], stdout)
 	if err != nil {
 		if flags.WroteHelp(err) {
 			return
 		}
 		panic(err)
 	}
-	logger := x.NewLogger(len(arguments.Verbose))
+	logger := x.NewLogger(len(arguments.Verbose), stdout)
 	logger.Log("x " + x.Version + " (Commit: " + x.Commit + ", Build date: " + x.Date + ")")
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -27,7 +28,7 @@ func Execute() {
 		os.Exit(1)
 	}
 	logger.Log("Use project path: "+projectPath, x.DebugOn)
-	tf, err := x.NewTaskfile(logger, projectPath, arguments.Taskfiles)
+	tf, err := x.NewTaskfile(logger, projectPath, arguments.Taskfiles, os.ReadFile)
 	if err != nil {
 		logger.Error(err)
 		os.Exit(1)
@@ -38,12 +39,12 @@ func Execute() {
 		os.Exit(1)
 	}
 
-	runtime, err := x.NewRuntime(projectPath, cwd, arguments, cfg, tf, logger)
+	runtime, err := x.NewRuntime(os.Stdin, stdout, os.Stderr, projectPath, arguments, cfg, tf, logger)
 	if err != nil {
 		logger.Error(err)
 		os.Exit(1)
 	}
-	err = runtime.Execute()
+	err = runtime.Run()
 	if err != nil {
 		logger.Error(err)
 		os.Exit(1)

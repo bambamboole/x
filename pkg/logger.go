@@ -3,7 +3,6 @@ package pkg
 import (
 	"github.com/fatih/color"
 	"io"
-	"os"
 )
 
 const (
@@ -56,10 +55,10 @@ func (l *IOLogger) write(v any, col *color.Color) {
 	}
 }
 
-func NewLogger(debug int) IOLoggerInterface {
+func NewLogger(debug int, stdout io.Writer) IOLoggerInterface {
 	logger := &IOLogger{
 		debug: debug,
-		out:   os.Stdout,
+		out:   stdout,
 	}
 	logger.Log("Debug output enabled", DebugOn)
 

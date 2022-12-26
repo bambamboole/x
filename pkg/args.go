@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"github.com/jessevdk/go-flags"
-	"os"
+	"io"
 	"strings"
 )
 
@@ -14,7 +14,7 @@ type Arguments struct {
 	Command     []string
 }
 
-func ParseArgs(args []string) (Arguments, error) {
+func ParseArgs(args []string, stdout io.Writer) (Arguments, error) {
 	a := Arguments{}
 	p := flags.NewParser(&a, flags.IgnoreUnknown|flags.HelpFlag|flags.PrintErrors|flags.PassDoubleDash)
 	args, err := p.Parse()
@@ -22,7 +22,7 @@ func ParseArgs(args []string) (Arguments, error) {
 		return a, err
 	}
 	if len(args) == 0 {
-		p.WriteHelp(os.Stdout)
+		p.WriteHelp(stdout)
 		return a, &flags.Error{Type: flags.ErrHelp}
 	}
 	// append verbose flag if present, since it gets removed by the flags parser

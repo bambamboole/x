@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"os"
 	"path"
 	"strings"
 )
@@ -10,7 +9,7 @@ type Taskfile struct {
 	script string
 }
 
-func NewTaskfile(logger IOLoggerInterface, projectPath string, additionalTaskFiles []string) (Taskfile, error) {
+func NewTaskfile(logger IOLoggerInterface, projectPath string, additionalTaskFiles []string, readFile func(string) ([]byte, error)) (Taskfile, error) {
 	taskFiles := append(additionalTaskFiles, path.Join(projectPath, "Taskfile"), path.Join(projectPath, "Taskfile.local"))
 	scriptContent := ""
 	for _, taskFile := range taskFiles {
@@ -20,7 +19,7 @@ func NewTaskfile(logger IOLoggerInterface, projectPath string, additionalTaskFil
 		}
 		logger.Log("Found file at: "+taskFile+" - will be attached Taskfile", DebugOn)
 
-		content, err := os.ReadFile(taskFile)
+		content, err := readFile(taskFile)
 		if err != nil {
 			return Taskfile{}, err
 		}
