@@ -20,7 +20,6 @@ func (e *executor) execute(workingDir string, command string, args ...string) er
 	cancelChan := make(chan os.Signal, 1)
 	signal.Notify(cancelChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGXFSZ)
 	cmd := exec.Command(command, args...)
-	e.logger.Log(workingDir)
 	cmd.Dir = workingDir
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -58,7 +57,7 @@ func (r *Runtime) Execute() error {
 	bash, _ := exec.LookPath(r.args.Shell)
 	task := "task:" + strings.Join(r.args.Command, " ")
 	r.logger.Log("Using Taskfile content: \n"+r.Taskfile.script, DebugVerbose)
-	r.logger.Log("Executing command: "+task, DebugOn)
+	r.logger.Log("Executing command: " + task)
 	return r.executor.execute(r.projectPath, bash, "-c", r.Taskfile.script+"\n"+task)
 }
 

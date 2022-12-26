@@ -22,6 +22,10 @@ func main() {
 		return
 	}
 	projectPath := x.DetectProjectPath(cwd)
+	if projectPath == "" {
+		logger.Error("Was not able to detect project path")
+		return
+	}
 	logger.Log("Use project path: "+projectPath, x.DebugOn)
 	tf, err := x.NewTaskfile(logger, projectPath, arguments.Taskfiles)
 	if err != nil {
