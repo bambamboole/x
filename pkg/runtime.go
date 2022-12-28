@@ -59,6 +59,23 @@ x:error() {
     echo -e "${X_FONT_RED}${1:-}${X_FONT_RESTORE}" >&2
 }
 
+x:function_exists() {
+    local function="${1:-}"
+    if [ -z "function" ]
+    then
+        b5:error "Usage: x:function_exists <function_name>"
+        return 254
+    fi
+
+    local type_result=$( type -t "${function}" )
+    if [ "$type_result" == "function" ]
+    then
+        return 0
+    else
+        return 1
+    fi
+}
+
 `
 	for moduleName, module := range r.registry.GetModules() {
 		err := r.config.PopulateModuleConfig(moduleName, module.GetConfig())
