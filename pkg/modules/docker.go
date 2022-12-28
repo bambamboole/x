@@ -28,11 +28,13 @@ func (d *DockerModule) GetScript() (string, error) {
 	var b bytes.Buffer
 
 	for name, cmd := range d.config.Commands {
+		cmd.Name = name
 		t, err := template.New("command").Parse(`
 # docker-compose options
 
 docker:container_run() {
 	# Parse container name
+	{{/* This is how we have to write a bash sequence with curly braces in text/template */}}
 	local container="{{"${1:-}"}}"
 	shift
 	if [ -z "$container" ]
@@ -54,11 +56,7 @@ docker:{{.Name}}() {
 		if err != nil {
 			return b.String(), err
 		}
-		err = t.Execute(&b, struct {
-			Name    string
-			Service string
-			Bin     string
-		}{Name: name, Service: cmd.Service, Bin: cmd.Bin})
+		err = t.Execute(&b, cmd)
 		if err != nil {
 			return b.String(), err
 		}
