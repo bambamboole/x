@@ -18,7 +18,7 @@ func TestIOLogger_Log(t *testing.T) {
 
 		assert.Equal(t, "test\n", b.String())
 	})
-	t.Run("It can log structs", func(t *testing.T) {
+	t.Run("It can log properties of structs", func(t *testing.T) {
 		var b bytes.Buffer
 		l := &IOLogger{
 			debug: DebugOff,
@@ -30,6 +30,6 @@ func TestIOLogger_Log(t *testing.T) {
 
 		l.Log(testStruct)
 
-		assert.Equal(t, "struct { Name string }{Name:\"test\"}\n", b.String())
+		assert.Equal(t, "name: test\n\n", b.String())
 	})
 }
