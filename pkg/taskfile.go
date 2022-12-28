@@ -14,7 +14,7 @@ func NewTaskfile(logger IOLoggerInterface, projectPath string, additionalTaskFil
 	scriptContent := ""
 	for _, taskFile := range taskFiles {
 		if !fileExists(taskFile) {
-			logger.Log("No Taskfile found at: "+taskFile, DebugOn)
+			logger.Log("No Taskfile found at: "+taskFile, DebugVerbose)
 			continue
 		}
 		logger.Log("Found file at: "+taskFile+" - will be attached Taskfile", DebugOn)
