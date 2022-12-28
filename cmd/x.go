@@ -44,7 +44,9 @@ func Execute() {
 		Stdout: stdout,
 		Stderr: os.Stderr,
 	}
-	runtime, err := x.NewRuntime(commandManager, projectPath, arguments, cfg, tf, logger)
+
+	mr := x.NewModuleRegistry()
+	runtime, err := x.NewRuntime(mr, commandManager, projectPath, arguments, cfg, tf, logger)
 	if err != nil {
 		logger.Error(err)
 		os.Exit(1)

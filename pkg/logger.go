@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"github.com/fatih/color"
+	"gopkg.in/yaml.v3"
 	"io"
 )
 
@@ -53,7 +54,8 @@ func (l *IOLogger) Error(v any) {
 func (l *IOLogger) write(v any, col *color.Color) {
 	switch v.(type) {
 	default:
-		_, _ = col.Fprintf(l.out, "%#v\n", v)
+		vJSON, _ := yaml.Marshal(v)
+		_, _ = col.Fprintln(l.out, string(vJSON))
 	case string:
 		_, _ = col.Fprintln(l.out, v)
 	}
